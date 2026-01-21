@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Olauncher Döküntüsüz</string>
-    <string name="accessibility_service_name">OlauncherCF Eylem Servisi</string>
+    <string name="accessibility_service_name">OlauncherRedux Eylem Servisi</string>
     <string name="app">Uygulama</string>
     <string name="set_as_default_launcher">Varsayılan başlatıcı olarak ayarla</string>
     <string name="app_text_color">Metin rengi</string>

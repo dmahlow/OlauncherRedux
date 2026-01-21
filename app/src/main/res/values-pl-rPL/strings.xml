@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Olauncher Clutter Free</string>
-    <string name="accessibility_service_name">Usługa Akcji OlauncherCF</string>
+    <string name="app_name">OlauncherRedux</string>
+    <string name="accessibility_service_name">Usługa Akcji OlauncherRedux</string>
     <string name="app">Aplikacja</string>
     <string name="set_as_default_launcher">Ustaw jako domyślny launcher</string>
     <string name="app_text_color">Kolor tekstu</string>
@@ -52,7 +52,7 @@
     <string name="system_default">Systemowy</string>
     <string name="dark">Ciemny</string>
     <string name="light">Jasny</string>
-    <string name="accessibility_service_description">Ta usługa dostępności pozwala OlauncherCF wykonywać określone czynności, takie jak blokowanie ekranu lub otwieranie szybkich ustawień.</string>
+    <string name="accessibility_service_description">Ta usługa dostępności pozwala OlauncherRedux wykonywać określone czynności, takie jak blokowanie ekranu lub otwieranie szybkich ustawień.</string>
     <string name="open">Otwórz link</string>
     <string name="copy">Kopiuj</string>
     <string name="close">Zamknij</string>

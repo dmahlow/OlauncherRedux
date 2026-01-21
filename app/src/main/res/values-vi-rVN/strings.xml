@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Olauncher Clutter Free</string>
-    <string name="accessibility_service_name">Dịch vụ hành động OlauncherCF</string>
+    <string name="app_name">OlauncherRedux</string>
+    <string name="accessibility_service_name">Dịch vụ hành động OlauncherRedux</string>
     <string name="app">Ứng Dụng</string>
     <string name="set_as_default_launcher">Đặt làm trình khởi chạy mặc định</string>
     <string name="app_text_color">Màu văn bản</string>
@@ -52,7 +52,7 @@
     <string name="system_default">Hệ thống</string>
     <string name="dark">Tối</string>
     <string name="light">Sáng</string>
-    <string name="accessibility_service_description">Dịch vụ trợ năng này cho phép OlauncherCF thực hiện một số hành động nhất định như khóa màn hình hoặc mở cài đặt nhanh.</string>
+    <string name="accessibility_service_description">Dịch vụ trợ năng này cho phép OlauncherRedux thực hiện một số hành động nhất định như khóa màn hình hoặc mở cài đặt nhanh.</string>
     <string name="open">Mở liên kết</string>
     <string name="copy">Sao Chép</string>
     <string name="close">Đóng</string>

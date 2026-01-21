@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">mLauncher</string>
-    <string name="accessibility_service_name">OlauncherCF Actions Service</string>
+    <string name="accessibility_service_name">OlauncherRedux Actions Service</string>
     <string name="app">Programėlė</string>
     <string name="set_as_default_launcher">Nustatyti kaip numatomajį darbalaukį</string>
     <string name="app_text_color">Teksto spalva</string>

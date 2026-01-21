@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Olauncher Rommelvrij</string>
-    <string name="accessibility_service_name">OlauncherCF Acties Service</string>
+    <string name="accessibility_service_name">OlauncherRedux Acties Service</string>
     <string name="app">Applicatie</string>
     <string name="set_as_default_launcher">Stel in als standaard launcher</string>
     <string name="app_text_color">Tekst kleur</string>

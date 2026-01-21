@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Olauncher Clutter Free</string>
-    <string name="accessibility_service_name">Служба дій OlauncherCF</string>
+    <string name="app_name">OlauncherRedux</string>
+    <string name="accessibility_service_name">Служба дій OlauncherRedux</string>
     <string name="app">Застосунок</string>
     <string name="set_as_default_launcher">Установити як робочий стіл за замовчуванням</string>
     <string name="app_text_color">Колір тексту</string>
@@ -52,7 +52,7 @@
     <string name="system_default">Системна</string>
     <string name="dark">Темна</string>
     <string name="light">Світла</string>
-    <string name="accessibility_service_description">Ця служба доступності дозволяє OlauncherCF виконувати певні дії, наприклад блокувати екран або відкривати швидкі налаштування.</string>
+    <string name="accessibility_service_description">Ця служба доступності дозволяє OlauncherRedux виконувати певні дії, наприклад блокувати екран або відкривати швидкі налаштування.</string>
     <string name="open">Відкрити посилання</string>
     <string name="copy">Копіювати</string>
     <string name="close">Закрити</string>

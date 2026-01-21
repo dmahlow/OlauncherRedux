@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">난잡하지 않은 Olauncher</string>
-    <string name="accessibility_service_name">OlauncherCF Actions Service</string>
+    <string name="accessibility_service_name">OlauncherRedux Actions Service</string>
     <string name="app">앱</string>
     <string name="set_as_default_launcher">기본 런처로 설정</string>
     <string name="app_text_color">텍스트 색상</string>

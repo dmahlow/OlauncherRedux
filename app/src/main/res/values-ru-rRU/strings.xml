@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Olauncher Clutter Free</string>
-    <string name="accessibility_service_name">OlauncherCF Служба действий</string>
+    <string name="app_name">OlauncherRedux</string>
+    <string name="accessibility_service_name">OlauncherRedux Служба действий</string>
     <string name="app">Приложение</string>
     <string name="set_as_default_launcher">Назначить главным лаунчером</string>
     <string name="app_text_color">Цвет текста</string>
