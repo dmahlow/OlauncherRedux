@@ -17,8 +17,8 @@ android {
         applicationId "app.olauncherredux"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 34
-        versionName "v1.6.6"
+        versionCode 35
+        versionName "v2.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
