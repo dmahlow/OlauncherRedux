@@ -1,9 +1,9 @@
-package app.olaunchercf.data
+package app.olauncherredux.data
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import app.olaunchercf.R
+import app.olauncherredux.R
 import java.util.*
 
 interface EnumOption {
@@ -190,6 +190,19 @@ object Constants {
                 System -> stringResource(R.string.lang_system)
                 Dark -> stringResource(R.string.dark)
                 Light -> stringResource(R.string.light)
+            }
+        }
+    }
+
+    enum class SortOrder: EnumOption {
+        Alphabetical,
+        MostUsed;
+
+        @Composable
+        override fun string(): String {
+            return when(this) {
+                Alphabetical -> stringResource(R.string.sort_alphabetical)
+                MostUsed -> stringResource(R.string.sort_most_used)
             }
         }
     }

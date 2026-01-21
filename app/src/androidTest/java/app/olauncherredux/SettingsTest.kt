@@ -1,4 +1,4 @@
-package app.olaunchercf
+package app.olauncherredux
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -17,9 +17,9 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
-import app.olaunchercf.data.Constants
-import app.olaunchercf.data.Prefs
-import app.olaunchercf.ui.AppDrawerAdapter
+import app.olauncherredux.data.Constants
+import app.olauncherredux.data.Prefs
+import app.olauncherredux.ui.AppDrawerAdapter
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.allOf
 import org.junit.Before

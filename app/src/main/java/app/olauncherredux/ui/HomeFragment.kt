@@ -1,4 +1,4 @@
-package app.olaunchercf.ui
+package app.olauncherredux.ui
 
 import android.annotation.SuppressLint
 import android.app.admin.DevicePolicyManager
@@ -18,16 +18,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import app.olaunchercf.MainViewModel
-import app.olaunchercf.R
-import app.olaunchercf.data.AppModel
-import app.olaunchercf.data.Constants.Action
-import app.olaunchercf.data.Constants.AppDrawerFlag
-import app.olaunchercf.data.Prefs
-import app.olaunchercf.databinding.FragmentHomeBinding
-import app.olaunchercf.helper.*
-import app.olaunchercf.listener.OnSwipeTouchListener
-import app.olaunchercf.listener.ViewSwipeTouchListener
+import app.olauncherredux.MainViewModel
+import app.olauncherredux.R
+import app.olauncherredux.data.AppModel
+import app.olauncherredux.data.Constants.Action
+import app.olauncherredux.data.Constants.AppDrawerFlag
+import app.olauncherredux.data.Prefs
+import app.olauncherredux.databinding.FragmentHomeBinding
+import app.olauncherredux.helper.*
+import app.olauncherredux.listener.OnSwipeTouchListener
+import app.olauncherredux.listener.ViewSwipeTouchListener
 import kotlinx.coroutines.launch
 
 

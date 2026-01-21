@@ -1,4 +1,4 @@
-package app.olaunchercf.helper
+package app.olauncherredux.helper
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent

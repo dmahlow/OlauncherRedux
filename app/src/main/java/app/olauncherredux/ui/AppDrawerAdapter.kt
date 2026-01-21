@@ -1,4 +1,4 @@
-package app.olaunchercf.ui
+package app.olauncherredux.ui
 
 import android.content.res.Resources
 import android.text.Editable
@@ -13,13 +13,13 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.RecyclerView
-import app.olaunchercf.R
-import app.olaunchercf.data.AppModel
-import app.olaunchercf.data.Constants.AppDrawerFlag
-import app.olaunchercf.data.Prefs
-import app.olaunchercf.databinding.AdapterAppDrawerBinding
-import app.olaunchercf.helper.dp2px
-import app.olaunchercf.helper.uninstallApp
+import app.olauncherredux.R
+import app.olauncherredux.data.AppModel
+import app.olauncherredux.data.Constants.AppDrawerFlag
+import app.olauncherredux.data.Prefs
+import app.olauncherredux.databinding.AdapterAppDrawerBinding
+import app.olauncherredux.helper.dp2px
+import app.olauncherredux.helper.uninstallApp
 import java.text.Normalizer
 
 

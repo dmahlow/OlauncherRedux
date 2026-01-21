@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!--<uses-permission android:name="android.permission.SET_WALLPAPER" />-->
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
@@ -8,6 +9,10 @@
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
 
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+
+    <!--For sorting apps by usage frequency-->
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:allowBackup="true"
@@ -18,7 +23,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name="app.olaunchercf.MainActivity"
+            android:name="app.olauncherredux.MainActivity"
             android:configChanges="uiMode"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
@@ -35,7 +40,7 @@
         </activity>
 
         <activity
-            android:name="app.olaunchercf.helper.FakeHomeActivity"
+            android:name="app.olauncherredux.helper.FakeHomeActivity"
             android:enabled="false"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden"
@@ -50,7 +55,7 @@
         </activity>
 
         <receiver
-            android:name="app.olaunchercf.listener.DeviceAdmin"
+            android:name="app.olauncherredux.listener.DeviceAdmin"
             android:permission="android.permission.BIND_DEVICE_ADMIN"
             android:exported="false">
             <meta-data
@@ -62,7 +67,7 @@
         </receiver>
 
         <service
-            android:name="app.olaunchercf.helper.ActionService"
+            android:name="app.olauncherredux.helper.ActionService"
             android:label="@string/accessibility_service_name"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:exported="false">

@@ -1,10 +1,10 @@
-package app.olaunchercf.data
+package app.olauncherredux.data
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.UserHandle
 import android.util.Log
-import app.olaunchercf.helper.getUserHandleFromString
+import app.olauncherredux.helper.getUserHandleFromString
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -38,6 +38,7 @@ private const val HIDDEN_APPS = "HIDDEN_APPS"
 private const val HIDDEN_APPS_UPDATED = "HIDDEN_APPS_UPDATED"
 private const val SHOW_HINT_COUNTER = "SHOW_HINT_COUNTER"
 private const val APP_THEME = "APP_THEME"
+private const val DRAWER_SORT_ORDER = "DRAWER_SORT_ORDER"
 
 private const val APP_NAME = "APP_NAME"
 private const val APP_PACKAGE = "APP_PACKAGE"
@@ -243,6 +244,16 @@ class Prefs(val context: Context) {
             }
         }
         set(value) = prefs.edit().putString(APP_THEME, value.name).apply()
+
+    var drawerSortOrder: Constants.SortOrder
+        get() {
+            return try {
+                Constants.SortOrder.valueOf(prefs.getString(DRAWER_SORT_ORDER, Constants.SortOrder.Alphabetical.name).toString())
+            } catch (_: Exception) {
+                Constants.SortOrder.Alphabetical
+            }
+        }
+        set(value) = prefs.edit().putString(DRAWER_SORT_ORDER, value.name).apply()
 
     var language: Constants.Language
         get() {

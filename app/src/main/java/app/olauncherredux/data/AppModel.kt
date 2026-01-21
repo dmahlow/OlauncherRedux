@@ -1,4 +1,4 @@
-package app.olaunchercf.data
+package app.olauncherredux.data
 
 import android.os.UserHandle
 import java.text.CollationKey

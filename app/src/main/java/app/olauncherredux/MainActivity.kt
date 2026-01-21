@@ -1,4 +1,4 @@
-package app.olaunchercf
+package app.olauncherredux
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -16,12 +16,12 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import app.olaunchercf.data.Constants
-import app.olaunchercf.data.Constants.value
-import app.olaunchercf.data.Prefs
-import app.olaunchercf.databinding.ActivityMainBinding
-import app.olaunchercf.helper.isTablet
-import app.olaunchercf.helper.showToastLong
+import app.olauncherredux.data.Constants
+import app.olauncherredux.data.Constants.value
+import app.olauncherredux.data.Prefs
+import app.olauncherredux.databinding.ActivityMainBinding
+import app.olauncherredux.helper.isTablet
+import app.olauncherredux.helper.showToastLong
 import java.io.BufferedReader
 import java.io.FileOutputStream
 import java.io.InputStreamReader

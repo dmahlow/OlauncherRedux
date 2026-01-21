@@ -12,11 +12,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import app.olaunchercf.R
-import app.olaunchercf.style.CORNER_RADIUS
-import app.olaunchercf.style.textDark
-import app.olaunchercf.style.textGray
-import app.olaunchercf.style.textLight
+import app.olauncherredux.R
+import app.olauncherredux.style.CORNER_RADIUS
+import app.olauncherredux.style.textDark
+import app.olauncherredux.style.textGray
+import app.olauncherredux.style.textLight
 
 @Immutable
 data class ReplacementTypography(

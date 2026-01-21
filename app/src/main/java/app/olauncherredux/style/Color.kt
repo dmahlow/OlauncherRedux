@@ -1,4 +1,4 @@
-package app.olaunchercf.style
+package app.olauncherredux.style
 
 import androidx.compose.ui.graphics.Color
 

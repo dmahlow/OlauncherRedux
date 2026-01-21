@@ -1,4 +1,4 @@
-package app.olaunchercf.listener
+package app.olauncherredux.listener
 
 import android.app.admin.DeviceAdminReceiver
 import android.content.Context

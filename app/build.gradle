@@ -14,7 +14,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "app.olaunchercf"
+        applicationId "app.olauncherredux"
         minSdkVersion 23
         targetSdkVersion 33
         versionCode 34
@@ -68,7 +68,7 @@ android {
     lint {
         abortOnError false
     }
-    namespace 'app.olaunchercf'
+    namespace 'app.olauncherredux'
 }
 
 dependencies {

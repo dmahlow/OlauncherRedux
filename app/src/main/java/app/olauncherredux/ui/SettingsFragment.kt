@@ -1,4 +1,4 @@
-package app.olaunchercf.ui
+package app.olauncherredux.ui
 
 import SettingsTheme
 import android.app.Activity
@@ -35,25 +35,33 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import app.olaunchercf.BuildConfig
-import app.olaunchercf.MainViewModel
-import app.olaunchercf.R
-import app.olaunchercf.data.Constants
-import app.olaunchercf.data.Constants.Action
-import app.olaunchercf.data.Constants.AppDrawerFlag
-import app.olaunchercf.data.Constants.Theme.*
-import app.olaunchercf.data.Prefs
-import app.olaunchercf.databinding.FragmentSettingsBinding
-import app.olaunchercf.helper.*
-import app.olaunchercf.listener.DeviceAdmin
-import app.olaunchercf.ui.compose.SettingsComposable.SettingsArea
-import app.olaunchercf.ui.compose.SettingsComposable.SettingsGestureItem
-import app.olaunchercf.ui.compose.SettingsComposable.SettingsItem
-import app.olaunchercf.ui.compose.SettingsComposable.SettingsNumberItem
-import app.olaunchercf.ui.compose.SettingsComposable.SettingsToggle
-import app.olaunchercf.ui.compose.SettingsComposable.SettingsTopView
-import app.olaunchercf.ui.compose.SettingsComposable.SettingsTwoButtonRow
-import app.olaunchercf.ui.compose.SettingsComposable.SimpleTextButton
+import app.olauncherredux.BuildConfig
+import app.olauncherredux.MainViewModel
+import app.olauncherredux.R
+import app.olauncherredux.data.Constants
+import app.olauncherredux.data.Constants.Action
+import app.olauncherredux.data.Constants.AppDrawerFlag
+import app.olauncherredux.data.Constants.Theme.*
+import app.olauncherredux.data.Prefs
+import app.olauncherredux.databinding.FragmentSettingsBinding
+import app.olauncherredux.helper.hasUsageStatsPermission
+import app.olauncherredux.helper.hideStatusBar
+import app.olauncherredux.helper.isOlauncherDefault
+import app.olauncherredux.helper.loadFile
+import app.olauncherredux.helper.openAppInfo
+import app.olauncherredux.helper.openUsageAccessSettings
+import app.olauncherredux.helper.resetDefaultLauncher
+import app.olauncherredux.helper.showStatusBar
+import app.olauncherredux.helper.storeFile
+import app.olauncherredux.listener.DeviceAdmin
+import app.olauncherredux.ui.compose.SettingsComposable.SettingsArea
+import app.olauncherredux.ui.compose.SettingsComposable.SettingsGestureItem
+import app.olauncherredux.ui.compose.SettingsComposable.SettingsItem
+import app.olauncherredux.ui.compose.SettingsComposable.SettingsNumberItem
+import app.olauncherredux.ui.compose.SettingsComposable.SettingsToggle
+import app.olauncherredux.ui.compose.SettingsComposable.SettingsTopView
+import app.olauncherredux.ui.compose.SettingsComposable.SettingsTwoButtonRow
+import app.olauncherredux.ui.compose.SettingsComposable.SimpleTextButton
 
 class SettingsFragment : Fragment() {
 
@@ -186,6 +194,16 @@ class SettingsFragment : Fragment() {
                             onChange = onChange,
                             state = remember { mutableStateOf(prefs.autoOpenApp) },
                         ) { toggleAutoOpenApp() }
+                    },
+                    { open, onChange ->
+                        SettingsItem(
+                            title = stringResource(R.string.app_drawer_sort),
+                            open = open,
+                            onChange = onChange,
+                            currentSelection = remember { mutableStateOf(prefs.drawerSortOrder) },
+                            values = Constants.SortOrder.values(),
+                            onSelect = { sortOrder -> setDrawerSortOrder(sortOrder) }
+                        )
                     },
                 )
             )
@@ -453,6 +471,16 @@ class SettingsFragment : Fragment() {
 
     private fun toggleAutoOpenApp() {
         prefs.autoOpenApp = !prefs.autoOpenApp
+    }
+
+    private fun setDrawerSortOrder(sortOrder: Constants.SortOrder) {
+        if (sortOrder == Constants.SortOrder.MostUsed && !hasUsageStatsPermission(requireContext())) {
+            // Need to prompt user to grant usage access permission
+            openUsageAccessSettings(requireContext())
+        }
+        prefs.drawerSortOrder = sortOrder
+        // Refresh the app list to apply new sorting
+        viewModel.getAppList()
     }
 
     private fun setTheme(appTheme: Constants.Theme) {

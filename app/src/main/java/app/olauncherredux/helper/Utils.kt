@@ -1,7 +1,10 @@
-package app.olaunchercf.helper
+package app.olauncherredux.helper
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AppOpsManager
+import android.app.usage.UsageStats
+import android.app.usage.UsageStatsManager
 import android.content.*
 import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
@@ -12,6 +15,7 @@ import android.content.res.Resources
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Process
 import android.os.UserHandle
 import android.os.UserManager
 import android.provider.AlarmClock
@@ -29,12 +33,13 @@ import android.widget.Toast
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.core.app.ActivityCompat
-import app.olaunchercf.BuildConfig
-import app.olaunchercf.R
-import app.olaunchercf.data.AppModel
-import app.olaunchercf.data.Constants.BACKUP_READ
-import app.olaunchercf.data.Constants.BACKUP_WRITE
-import app.olaunchercf.data.Prefs
+import app.olauncherredux.BuildConfig
+import app.olauncherredux.R
+import app.olauncherredux.data.AppModel
+import app.olauncherredux.data.Constants
+import app.olauncherredux.data.Constants.BACKUP_READ
+import app.olauncherredux.data.Constants.BACKUP_WRITE
+import app.olauncherredux.data.Prefs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -63,14 +68,13 @@ suspend fun getAppsList(context: Context, showHiddenApps: Boolean = false): Muta
         val appList: MutableList<AppModel> = mutableListOf()
 
         try {
-            if (!Prefs(context).hiddenAppsUpdated) upgradeHiddenApps(Prefs(context))
-            val hiddenApps = Prefs(context).hiddenApps
+            val prefs = Prefs(context)
+            if (!prefs.hiddenAppsUpdated) upgradeHiddenApps(prefs)
+            val hiddenApps = prefs.hiddenApps
 
             val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
             val launcherApps = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
             val collator = Collator.getInstance()
-
-            val prefs = Prefs(context)
 
             for (profile in userManager.userProfiles) {
                 for (app in launcherApps.getActivityList(null, profile)) {
@@ -109,11 +113,51 @@ suspend fun getAppsList(context: Context, showHiddenApps: Boolean = false): Muta
                 }
             }
 
-            appList.sortBy {
-                if (it.appAlias.isEmpty()) {
-                    it.appLabel.lowercase()
-                } else {
-                    it.appAlias.lowercase()
+            // Sort based on preference
+            when (prefs.drawerSortOrder) {
+                Constants.SortOrder.MostUsed -> {
+                    val usageScores = getAppUsageScores(context)
+                    if (usageScores.isNotEmpty()) {
+                        // Get apps that are already quick-accessible (home screen + gestures)
+                        val quickAccessApps = getQuickAccessApps(prefs)
+
+                        // Sort by usage score descending, then alphabetically for apps with no usage
+                        // Deprioritize apps that are already on home screen or assigned to gestures
+                        appList.sortWith { a, b ->
+                            val aIsQuickAccess = quickAccessApps.contains(a.appPackage)
+                            val bIsQuickAccess = quickAccessApps.contains(b.appPackage)
+
+                            // Quick access apps go to the bottom
+                            when {
+                                aIsQuickAccess && !bIsQuickAccess -> 1
+                                !aIsQuickAccess && bIsQuickAccess -> -1
+                                else -> {
+                                    // Both quick access or both not - sort by usage score
+                                    val scoreA = usageScores.getOrDefault(a.appPackage, 0L)
+                                    val scoreB = usageScores.getOrDefault(b.appPackage, 0L)
+                                    when {
+                                        scoreA != scoreB -> scoreB.compareTo(scoreA) // Higher score first
+                                        else -> {
+                                            // Alphabetical fallback
+                                            val nameA = if (a.appAlias.isEmpty()) a.appLabel.lowercase() else a.appAlias.lowercase()
+                                            val nameB = if (b.appAlias.isEmpty()) b.appLabel.lowercase() else b.appAlias.lowercase()
+                                            nameA.compareTo(nameB)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        // No usage data available, fall back to alphabetical
+                        appList.sortBy {
+                            if (it.appAlias.isEmpty()) it.appLabel.lowercase() else it.appAlias.lowercase()
+                        }
+                    }
+                }
+                Constants.SortOrder.Alphabetical -> {
+                    appList.sortBy {
+                        if (it.appAlias.isEmpty()) it.appLabel.lowercase() else it.appAlias.lowercase()
+                    }
                 }
             }
 
@@ -388,4 +432,111 @@ fun expandQuickSettings(context: Context) {
     } catch (e: Exception) {
         e.printStackTrace()
     }
+}
+
+/**
+ * Get package names of apps that are already quick-accessible via home screen or gestures.
+ * These should be deprioritized in the "most used" sort since they're already easy to access.
+ */
+fun getQuickAccessApps(prefs: Prefs): Set<String> {
+    val quickAccessApps = mutableSetOf<String>()
+
+    // Home screen apps
+    for (i in 0 until Constants.MAX_HOME_APPS) {
+        val app = prefs.getHomeAppModel(i)
+        if (app.appPackage.isNotEmpty()) {
+            quickAccessApps.add(app.appPackage)
+        }
+    }
+
+    // Gesture apps
+    listOf(
+        prefs.appSwipeLeft,
+        prefs.appSwipeRight,
+        prefs.appSwipeUp,
+        prefs.appSwipeDown,
+        prefs.appClickClock,
+        prefs.appClickDate,
+        prefs.appDoubleTap
+    ).forEach { app ->
+        if (app.appPackage.isNotEmpty()) {
+            quickAccessApps.add(app.appPackage)
+        }
+    }
+
+    return quickAccessApps
+}
+
+fun hasUsageStatsPermission(context: Context): Boolean {
+    val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+    val mode = appOps.checkOpNoThrow(
+        AppOpsManager.OPSTR_GET_USAGE_STATS,
+        Process.myUid(),
+        context.packageName
+    )
+    return mode == AppOpsManager.MODE_ALLOWED
+}
+
+fun openUsageAccessSettings(context: Context) {
+    try {
+        val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
+
+/**
+ * Get app usage scores with weighted recency.
+ * Recent usage (last 7 days) is weighted 3x more than older usage (8-30 days).
+ * Returns a map of package name to usage score.
+ */
+fun getAppUsageScores(context: Context): Map<String, Long> {
+    if (!hasUsageStatsPermission(context)) {
+        return emptyMap()
+    }
+
+    val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+    val endTime = System.currentTimeMillis()
+    val startTime30Days = endTime - (30L * 24 * 60 * 60 * 1000)
+    val startTime7Days = endTime - (7L * 24 * 60 * 60 * 1000)
+
+    val scores = mutableMapOf<String, Long>()
+
+    try {
+        // Get stats for the last 30 days
+        val stats30Days = usageStatsManager.queryUsageStats(
+            UsageStatsManager.INTERVAL_DAILY,
+            startTime30Days,
+            endTime
+        )
+
+        // Get stats for the last 7 days (weighted more heavily)
+        val stats7Days = usageStatsManager.queryUsageStats(
+            UsageStatsManager.INTERVAL_DAILY,
+            startTime7Days,
+            endTime
+        )
+
+        // Aggregate older usage (8-30 days) with weight 1
+        val recentPackages = stats7Days.map { it.packageName }.toSet()
+        for (stat in stats30Days) {
+            if (stat.packageName !in recentPackages) {
+                val current = scores.getOrDefault(stat.packageName, 0L)
+                // Use total time in foreground as a proxy for usage
+                scores[stat.packageName] = current + stat.totalTimeInForeground
+            }
+        }
+
+        // Add recent usage (last 7 days) with weight 3
+        for (stat in stats7Days) {
+            val current = scores.getOrDefault(stat.packageName, 0L)
+            scores[stat.packageName] = current + (stat.totalTimeInForeground * 3)
+        }
+    } catch (e: Exception) {
+        Log.e("UsageStats", "Error getting usage stats: $e")
+    }
+
+    return scores
 }
