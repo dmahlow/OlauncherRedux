@@ -39,6 +39,8 @@ private const val HIDDEN_APPS_UPDATED = "HIDDEN_APPS_UPDATED"
 private const val SHOW_HINT_COUNTER = "SHOW_HINT_COUNTER"
 private const val APP_THEME = "APP_THEME"
 private const val DRAWER_SORT_ORDER = "DRAWER_SORT_ORDER"
+private const val SHOW_DRAWER_ICONS = "SHOW_DRAWER_ICONS"
+private const val DRAWER_ICON_POSITION = "DRAWER_ICON_POSITION"
 
 private const val APP_NAME = "APP_NAME"
 private const val APP_PACKAGE = "APP_PACKAGE"
@@ -254,6 +256,20 @@ class Prefs(val context: Context) {
             }
         }
         set(value) = prefs.edit().putString(DRAWER_SORT_ORDER, value.name).apply()
+
+    var showDrawerIcons: Boolean
+        get() = prefs.getBoolean(SHOW_DRAWER_ICONS, false)
+        set(value) = prefs.edit().putBoolean(SHOW_DRAWER_ICONS, value).apply()
+
+    var drawerIconPosition: Constants.IconPosition
+        get() {
+            return try {
+                Constants.IconPosition.valueOf(prefs.getString(DRAWER_ICON_POSITION, Constants.IconPosition.Left.name).toString())
+            } catch (_: Exception) {
+                Constants.IconPosition.Left
+            }
+        }
+        set(value) = prefs.edit().putString(DRAWER_ICON_POSITION, value.name).apply()
 
     var language: Constants.Language
         get() {

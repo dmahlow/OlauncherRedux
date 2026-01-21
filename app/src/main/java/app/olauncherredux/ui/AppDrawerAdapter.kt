@@ -1,20 +1,18 @@
 package app.olauncherredux.ui
 
-import android.content.res.Resources
+import android.content.pm.PackageManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.util.TypedValue
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat.startActivity
-import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.RecyclerView
 import app.olauncherredux.R
 import app.olauncherredux.data.AppModel
+import app.olauncherredux.data.Constants
 import app.olauncherredux.data.Constants.AppDrawerFlag
 import app.olauncherredux.data.Prefs
 import app.olauncherredux.databinding.AdapterAppDrawerBinding
@@ -154,6 +152,8 @@ class AppDrawerAdapter(
         private val appHideLayout: ConstraintLayout = itemView.appHideLayout
         private val appTitle: TextView = itemView.appTitle
         private val appTitleFrame: FrameLayout = itemView.appTitleFrame
+        private val appTitleContainer: LinearLayout = itemView.appTitleContainer
+        private val appIcon: ImageView = itemView.appIcon
         private val appInfo: ImageView = itemView.appInfo
 
         fun bind(
@@ -203,16 +203,46 @@ class AppDrawerAdapter(
                 // set current name as default text in EditText
                 appRenameEdit.text = Editable.Factory.getInstance().newEditable(appName)
 
-                // set text gravity
-                val params = appTitle.layoutParams as FrameLayout.LayoutParams
-                params.gravity = appLabelGravity
-                appTitle.layoutParams = params
+                // Handle app icon display
+                val prefs = Prefs(context)
+                val iconSize = dp2px(resources, prefs.textSize)
 
+                if (prefs.showDrawerIcons) {
+                    try {
+                        val iconDrawable = context.packageManager.getApplicationIcon(appModel.appPackage)
+                        appIcon.setImageDrawable(iconDrawable)
+                        appIcon.layoutParams.width = iconSize
+                        appIcon.layoutParams.height = iconSize
+                        appIcon.visibility = View.VISIBLE
+
+                        // Handle icon position (left or right)
+                        val iconParams = appIcon.layoutParams as LinearLayout.LayoutParams
+                        appTitleContainer.removeView(appIcon)
+                        if (prefs.drawerIconPosition == Constants.IconPosition.Left) {
+                            iconParams.marginEnd = dp2px(resources, 8)
+                            iconParams.marginStart = 0
+                            appTitleContainer.addView(appIcon, 0)
+                        } else {
+                            iconParams.marginStart = dp2px(resources, 8)
+                            iconParams.marginEnd = 0
+                            appTitleContainer.addView(appIcon)
+                        }
+                        appIcon.layoutParams = iconParams
+                    } catch (e: PackageManager.NameNotFoundException) {
+                        appIcon.visibility = View.GONE
+                    }
+                } else {
+                    appIcon.visibility = View.GONE
+                }
+
+                // set container gravity
+                val containerParams = appTitleContainer.layoutParams as FrameLayout.LayoutParams
+                containerParams.gravity = appLabelGravity
+                appTitleContainer.layoutParams = containerParams
 
                 // add icon next to app name to indicate that this app is installed on another profile
                 if (appModel.user != android.os.Process.myUserHandle()) {
                     val icon = AppCompatResources.getDrawable(context, R.drawable.work_profile)
-                    val prefs = Prefs(context)
                     val px = dp2px(resources, prefs.textSize)
                     icon?.setBounds(0, 0, px, px)
                     if (appLabelGravity == Gravity.LEFT) {

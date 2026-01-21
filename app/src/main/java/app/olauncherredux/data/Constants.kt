@@ -206,4 +206,17 @@ object Constants {
             }
         }
     }
+
+    enum class IconPosition: EnumOption {
+        Left,
+        Right;
+
+        @Composable
+        override fun string(): String {
+            return when(this) {
+                Left -> stringResource(R.string.left)
+                Right -> stringResource(R.string.right)
+            }
+        }
+    }
 }

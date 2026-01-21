@@ -205,6 +205,23 @@ class SettingsFragment : Fragment() {
                             onSelect = { sortOrder -> setDrawerSortOrder(sortOrder) }
                         )
                     },
+                    { _, onChange ->
+                        SettingsToggle(
+                            title = stringResource(R.string.show_app_icons),
+                            onChange = onChange,
+                            state = remember { mutableStateOf(prefs.showDrawerIcons) },
+                        ) { toggleShowDrawerIcons() }
+                    },
+                    { open, onChange ->
+                        SettingsItem(
+                            title = stringResource(R.string.icon_position),
+                            open = open,
+                            onChange = onChange,
+                            currentSelection = remember { mutableStateOf(prefs.drawerIconPosition) },
+                            values = Constants.IconPosition.values(),
+                            onSelect = { position -> setDrawerIconPosition(position) }
+                        )
+                    },
                 )
             )
             SettingsArea(title = stringResource(R.string.homescreen),
@@ -481,6 +498,14 @@ class SettingsFragment : Fragment() {
         prefs.drawerSortOrder = sortOrder
         // Refresh the app list to apply new sorting
         viewModel.getAppList()
+    }
+
+    private fun toggleShowDrawerIcons() {
+        prefs.showDrawerIcons = !prefs.showDrawerIcons
+    }
+
+    private fun setDrawerIconPosition(position: Constants.IconPosition) {
+        prefs.drawerIconPosition = position
     }
 
     private fun setTheme(appTheme: Constants.Theme) {

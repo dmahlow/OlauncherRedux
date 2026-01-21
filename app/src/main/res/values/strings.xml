@@ -103,4 +103,7 @@
     <string name="sort_alphabetical">A-Z</string>
     <string name="sort_most_used">Most used</string>
 
+    <string name="show_app_icons">Show app icons</string>
+    <string name="icon_position">Icon position</string>
+
 </resources>
