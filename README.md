@@ -24,6 +24,9 @@ The original OlauncherCF repository is now archived and no longer maintained. Th
   - Weighted recency: last 7 days count 3x more than older usage
   - Home screen and gesture apps are deprioritized (they're already quick to access)
   - Requires granting "Usage access" permission in system settings
+- **Optional app icons in drawer** - show small icons alongside app names
+  - Icons sized to match text size
+  - Configurable position (left or right)
 
 ## Building
 
