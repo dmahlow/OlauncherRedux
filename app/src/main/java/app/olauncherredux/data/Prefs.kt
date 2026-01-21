@@ -114,9 +114,9 @@ class Prefs(val context: Context) {
     var homeAppsNum: Int
         get() {
             return try {
-                prefs.getInt(HOME_APPS_NUM, 4)
+                prefs.getInt(HOME_APPS_NUM, 6)
             } catch (_: Exception) {
-                4
+                6
             }
         }
         set(value) = prefs.edit().putInt(HOME_APPS_NUM, value).apply()
@@ -126,17 +126,17 @@ class Prefs(val context: Context) {
             return try {
                 val string = prefs.getString(
                     HOME_ALIGNMENT,
-                    Constants.Gravity.Left.name
+                    Constants.Gravity.Right.name
                 ).toString()
                 Constants.Gravity.valueOf(string)
             } catch (_: Exception) {
-                Constants.Gravity.Left
+                Constants.Gravity.Right
             }
         }
         set(value) = prefs.edit().putString(HOME_ALIGNMENT, value.toString()).apply()
 
     var homeAlignmentBottom: Boolean
-        get() = prefs.getBoolean(HOME_ALIGNMENT_BOTTOM, false)
+        get() = prefs.getBoolean(HOME_ALIGNMENT_BOTTOM, true)
         set(value) = prefs.edit().putBoolean(HOME_ALIGNMENT_BOTTOM, value).apply()
 
     var extendHomeAppsArea: Boolean
@@ -157,14 +157,14 @@ class Prefs(val context: Context) {
         get() {
             val string = prefs.getString(
                 DRAWER_ALIGNMENT,
-                Constants.Gravity.Right.name
+                Constants.Gravity.Center.name
             ).toString()
             return Constants.Gravity.valueOf(string)
         }
         set(value) = prefs.edit().putString(DRAWER_ALIGNMENT, value.name).apply()
 
     var showStatusBar: Boolean
-        get() = prefs.getBoolean(STATUS_BAR, false)
+        get() = prefs.getBoolean(STATUS_BAR, true)
         set(value) = prefs.edit().putBoolean(STATUS_BAR, value).apply()
 
     var showTime: Boolean
@@ -222,7 +222,7 @@ class Prefs(val context: Context) {
         set(value) = storeAction(CLICK_DATE_ACTION, value)
 
     var doubleTapAction: Constants.Action
-        get() = loadAction(DOUBLE_TAP_ACTION, Constants.Action.LockScreen)
+        get() = loadAction(DOUBLE_TAP_ACTION, Constants.Action.OpenApp)
         set(value) = storeAction(DOUBLE_TAP_ACTION, value)
 
     private fun loadAction(prefString: String, default: Constants.Action): Constants.Action {
@@ -240,9 +240,9 @@ class Prefs(val context: Context) {
     var appTheme: Constants.Theme
         get() {
             return try {
-                Constants.Theme.valueOf(prefs.getString(APP_THEME, Constants.Theme.System.name).toString())
+                Constants.Theme.valueOf(prefs.getString(APP_THEME, Constants.Theme.Dark.name).toString())
             } catch (_: Exception) {
-                Constants.Theme.System
+                Constants.Theme.Dark
             }
         }
         set(value) = prefs.edit().putString(APP_THEME, value.name).apply()
@@ -362,9 +362,9 @@ class Prefs(val context: Context) {
     var textSize: Int
         get() {
             return try {
-                prefs.getInt(TEXT_SIZE, 18)
+                prefs.getInt(TEXT_SIZE, 26)
             } catch (_: Exception) {
-                18
+                26
             }
         }
         set(value) = prefs.edit().putInt(TEXT_SIZE, value).apply()
