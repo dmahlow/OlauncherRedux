@@ -1,30 +1,29 @@
-Forked from <a href="https://f-droid.org/packages/app.olauncher/">Olauncher</a> because original version is cluttered
+OlauncherRedux is a minimal, text-only Android launcher. It is a fork of OlauncherCF (archived), which was a fork of Olauncher.
 
-- Removed clutter, like ads and links
-- You can rename apps in the app-drawer _(Renaming apps on the home screen is already supported. Just long-click on an app on the home screen and start typing)_
-- We have added a lot more options for gestures on the home screen:
-    - Gestures are now:
-        - Swiping up, down, left, right
-        - Clicking on the clock
-        - Clicking on the Date
-    - Possible actions now include:
-        - Open specified app
-        - Locking the screen
-        - Opening the notification drawer
-        - Opening the quick settings
-- You can also position the clock independently of the home apps
-- Change alignment of apps in app-drawer
-- Change font size
-- Removed internet permission. You never know what an app developer wants to know about you.
+What is new in OlauncherRedux:
 
+- App groups on the home screen. Put several apps behind one name and open them with a tap.
+- Sort the app drawer by most used. Apps you open often move to the top. Needs the "Usage access" permission.
+- Optional small app icons in the drawer.
+- Tap an empty home screen slot to pick an app.
+- A bundled dark wallpaper that fits the text-only look.
+- Better defaults: 10 slots, larger text, apps on the right and bottom, dark theme.
 
-Olauncher CF uses the following permissions:
+Features from OlauncherCF:
 
-- `android.permission.EXPAND_STATUS_BAR`
-	- Allows an application to expand or collapse the status bar.
-- `android.permission.QUERY_ALL_PACKAGES`
-	- Allows query of any normal app on the device, regardless of manifest declarations. Used to show the apps list.
-- `android.alarm.permission.SET_ALARM`
-	- Allows an application to broadcast an Intent to set an alarm for the user. Used to open the default alarm app if no other clock app is set in the settings.
-- `android.permission.REQUEST_DELETE_PACKAGES`
-	- Required for issuing the request to remove packages. This does not allow the app to remove apps directly; this only gives the permission to issue the request.
+- Text-only home screen with up to 15 shortcuts
+- Gestures for swipe up, down, left, right, clock, date and double tap
+- Rename and hide apps
+- Independent clock and date position
+- Text size and alignment settings
+- Backup and restore
+- No ads, no links, no internet permission
+
+OlauncherRedux uses the following permissions:
+
+- android.permission.SET_WALLPAPER: to set the bundled wallpaper when you ask for it.
+- android.permission.EXPAND_STATUS_BAR: to open the notification shade with a gesture.
+- android.permission.QUERY_ALL_PACKAGES: to list installed apps in the drawer.
+- com.android.alarm.permission.SET_ALARM: to open the alarm app when you tap the clock.
+- android.permission.REQUEST_DELETE_PACKAGES: to show the uninstall dialog for an app.
+- android.permission.PACKAGE_USAGE_STATS: optional, for sorting by most used.
