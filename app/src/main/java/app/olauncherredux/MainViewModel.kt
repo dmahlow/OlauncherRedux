@@ -33,13 +33,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val homeAppsAlignment = MutableLiveData(Pair(prefs.homeAlignment, prefs.homeAlignmentBottom))
     val homeAppsCount = MutableLiveData(prefs.homeAppsNum)
 
-    fun selectedApp(appModel: AppModel, flag: AppDrawerFlag, n: Int = 0) {
+    fun selectedApp(appModel: AppModel, flag: AppDrawerFlag, n: Int = 0, groupAppIndex: Int = -1) {
         when (flag) {
             AppDrawerFlag.LaunchApp, AppDrawerFlag.HiddenApps -> {
                 launchApp(appModel)
             }
             AppDrawerFlag.SetHomeApp -> {
                 prefs.setHomeAppModel(n, appModel)
+            }
+            AppDrawerFlag.SetGroupApp -> {
+                if (groupAppIndex >= 0) {
+                    prefs.setGroupAppModel(n, groupAppIndex, appModel)
+                    val count = prefs.getGroupAppCount(n)
+                    if (groupAppIndex >= count) {
+                        prefs.setGroupAppCount(n, groupAppIndex + 1)
+                    }
+                }
             }
             AppDrawerFlag.SetSwipeLeft -> prefs.appSwipeLeft = appModel
             AppDrawerFlag.SetSwipeRight -> prefs.appSwipeRight = appModel

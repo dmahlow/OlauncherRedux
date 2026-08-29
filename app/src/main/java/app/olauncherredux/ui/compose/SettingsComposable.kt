@@ -243,6 +243,21 @@ object SettingsComposable {
     }
 
     @Composable
+    fun SettingsButtonRow(
+        title: String,
+        buttonText: String,
+        fontSize: TextUnit = TextUnit.Unspecified,
+        onClick: () -> Unit,
+    ) {
+        SettingsRow(
+            title = title,
+            onClick = onClick,
+            buttonText = buttonText,
+            fontSize = fontSize,
+        )
+    }
+
+    @Composable
     fun SettingsTwoButtonRow(
         firstButtonText: String,
         secondButtonText: String,

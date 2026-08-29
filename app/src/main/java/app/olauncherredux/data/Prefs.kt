@@ -58,6 +58,10 @@ private const val DOUBLE_TAP = "DOUBLE_TAP"
 
 private const val TEXT_SIZE = "text_size"
 
+private const val HOME_SLOT_IS_GROUP = "HOME_SLOT_IS_GROUP"
+private const val GROUP_NAME = "GROUP_NAME"
+private const val GROUP_APP_COUNT = "GROUP_APP_COUNT"
+
 class Prefs(val context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_FILENAME, 0)
@@ -114,9 +118,9 @@ class Prefs(val context: Context) {
     var homeAppsNum: Int
         get() {
             return try {
-                prefs.getInt(HOME_APPS_NUM, 6)
+                prefs.getInt(HOME_APPS_NUM, 10)
             } catch (_: Exception) {
-                6
+                10
             }
         }
         set(value) = prefs.edit().putInt(HOME_APPS_NUM, value).apply()
@@ -250,9 +254,9 @@ class Prefs(val context: Context) {
     var drawerSortOrder: Constants.SortOrder
         get() {
             return try {
-                Constants.SortOrder.valueOf(prefs.getString(DRAWER_SORT_ORDER, Constants.SortOrder.Alphabetical.name).toString())
+                Constants.SortOrder.valueOf(prefs.getString(DRAWER_SORT_ORDER, Constants.SortOrder.MostUsed.name).toString())
             } catch (_: Exception) {
-                Constants.SortOrder.Alphabetical
+                Constants.SortOrder.MostUsed
             }
         }
         set(value) = prefs.edit().putString(DRAWER_SORT_ORDER, value.name).apply()
@@ -362,9 +366,9 @@ class Prefs(val context: Context) {
     var textSize: Int
         get() {
             return try {
-                prefs.getInt(TEXT_SIZE, 26)
+                prefs.getInt(TEXT_SIZE, 28)
             } catch (_: Exception) {
-                26
+                28
             }
         }
         set(value) = prefs.edit().putInt(TEXT_SIZE, value).apply()
@@ -388,6 +392,64 @@ class Prefs(val context: Context) {
             prefs.edit().putBoolean(key, false).apply() // save false under `key`
         }
         return  first
+    }
+
+    fun isHomeSlotGroup(i: Int): Boolean =
+        prefs.getBoolean("${HOME_SLOT_IS_GROUP}_$i", false)
+
+    fun setHomeSlotGroup(i: Int, isGroup: Boolean) =
+        prefs.edit().putBoolean("${HOME_SLOT_IS_GROUP}_$i", isGroup).apply()
+
+    fun getGroupName(i: Int): String =
+        prefs.getString("${GROUP_NAME}_$i", "").toString()
+
+    fun setGroupName(i: Int, name: String) =
+        prefs.edit().putString("${GROUP_NAME}_$i", name).apply()
+
+    fun getGroupAppCount(i: Int): Int =
+        try { prefs.getInt("${GROUP_APP_COUNT}_$i", 0) } catch (_: Exception) { 0 }
+
+    fun setGroupAppCount(i: Int, count: Int) =
+        prefs.edit().putInt("${GROUP_APP_COUNT}_$i", count).apply()
+
+    fun getGroupAppModel(groupIndex: Int, appIndex: Int): AppModel =
+        loadApp("GROUP_${groupIndex}_${appIndex}")
+
+    fun setGroupAppModel(groupIndex: Int, appIndex: Int, appModel: AppModel) =
+        storeApp("GROUP_${groupIndex}_${appIndex}", appModel)
+
+    fun removeGroupApp(groupIndex: Int, appIndex: Int) {
+        val count = getGroupAppCount(groupIndex)
+        for (j in appIndex until count - 1) {
+            val next = getGroupAppModel(groupIndex, j + 1)
+            setGroupAppModel(groupIndex, j, next)
+        }
+        if (count > 0) {
+            clearAppKeys("GROUP_${groupIndex}_${count - 1}")
+            setGroupAppCount(groupIndex, count - 1)
+        }
+    }
+
+    fun clearGroup(i: Int) {
+        val count = getGroupAppCount(i)
+        for (j in 0 until count) {
+            clearAppKeys("GROUP_${i}_$j")
+        }
+        val edit = prefs.edit()
+        edit.remove("${HOME_SLOT_IS_GROUP}_$i")
+        edit.remove("${GROUP_NAME}_$i")
+        edit.remove("${GROUP_APP_COUNT}_$i")
+        edit.apply()
+    }
+
+    private fun clearAppKeys(id: String) {
+        val edit = prefs.edit()
+        edit.remove("${APP_NAME}_$id")
+        edit.remove("${APP_PACKAGE}_$id")
+        edit.remove("${APP_ACTIVITY}_$id")
+        edit.remove("${APP_ALIAS}_$id")
+        edit.remove("${APP_USER}_$id")
+        edit.apply()
     }
 
     fun clear() {

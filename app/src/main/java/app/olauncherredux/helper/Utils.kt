@@ -441,11 +441,17 @@ fun expandQuickSettings(context: Context) {
 fun getQuickAccessApps(prefs: Prefs): Set<String> {
     val quickAccessApps = mutableSetOf<String>()
 
-    // Home screen apps
+    // Home screen apps (including group members)
     for (i in 0 until Constants.MAX_HOME_APPS) {
-        val app = prefs.getHomeAppModel(i)
-        if (app.appPackage.isNotEmpty()) {
-            quickAccessApps.add(app.appPackage)
+        if (prefs.isHomeSlotGroup(i)) {
+            val count = prefs.getGroupAppCount(i)
+            for (j in 0 until count) {
+                val app = prefs.getGroupAppModel(i, j)
+                if (app.appPackage.isNotEmpty()) quickAccessApps.add(app.appPackage)
+            }
+        } else {
+            val app = prefs.getHomeAppModel(i)
+            if (app.appPackage.isNotEmpty()) quickAccessApps.add(app.appPackage)
         }
     }
 
@@ -539,4 +545,25 @@ fun getAppUsageScores(context: Context): Map<String, Long> {
     }
 
     return scores
+}
+
+/**
+ * Set the wallpaper bundled with the app (res/raw/wallpaper.jpg) as the home screen wallpaper.
+ * Does file IO, call from a background thread.
+ */
+fun setBundledWallpaper(context: Context): Boolean {
+    return try {
+        val wallpaperManager = android.app.WallpaperManager.getInstance(context)
+        context.resources.openRawResource(R.raw.wallpaper).use { stream ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                wallpaperManager.setStream(stream, null, true, android.app.WallpaperManager.FLAG_SYSTEM)
+            } else {
+                wallpaperManager.setStream(stream)
+            }
+        }
+        true
+    } catch (e: Exception) {
+        Log.e("Wallpaper", "Error setting wallpaper: $e")
+        false
+    }
 }

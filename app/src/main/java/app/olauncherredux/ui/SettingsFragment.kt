@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import app.olauncherredux.BuildConfig
 import app.olauncherredux.MainViewModel
@@ -51,10 +52,13 @@ import app.olauncherredux.helper.loadFile
 import app.olauncherredux.helper.openAppInfo
 import app.olauncherredux.helper.openUsageAccessSettings
 import app.olauncherredux.helper.resetDefaultLauncher
+import app.olauncherredux.helper.setBundledWallpaper
+import app.olauncherredux.helper.showToastShort
 import app.olauncherredux.helper.showStatusBar
 import app.olauncherredux.helper.storeFile
 import app.olauncherredux.listener.DeviceAdmin
 import app.olauncherredux.ui.compose.SettingsComposable.SettingsArea
+import app.olauncherredux.ui.compose.SettingsComposable.SettingsButtonRow
 import app.olauncherredux.ui.compose.SettingsComposable.SettingsGestureItem
 import app.olauncherredux.ui.compose.SettingsComposable.SettingsItem
 import app.olauncherredux.ui.compose.SettingsComposable.SettingsNumberItem
@@ -62,6 +66,9 @@ import app.olauncherredux.ui.compose.SettingsComposable.SettingsToggle
 import app.olauncherredux.ui.compose.SettingsComposable.SettingsTopView
 import app.olauncherredux.ui.compose.SettingsComposable.SettingsTwoButtonRow
 import app.olauncherredux.ui.compose.SettingsComposable.SimpleTextButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SettingsFragment : Fragment() {
 
@@ -265,6 +272,12 @@ class SettingsFragment : Fragment() {
                             onChange = onChange,
                             state = remember { mutableStateOf(prefs.extendHomeAppsArea) }
                         ) { prefs.extendHomeAppsArea = !prefs.extendHomeAppsArea }
+                    },
+                    { _, _ ->
+                        SettingsButtonRow(
+                            title = stringResource(R.string.wallpaper),
+                            buttonText = stringResource(R.string.set_wallpaper),
+                        ) { applyWallpaper() }
                     },
                 )
             )
@@ -504,6 +517,16 @@ class SettingsFragment : Fragment() {
         prefs.showDrawerIcons = !prefs.showDrawerIcons
     }
 
+    private fun applyWallpaper() {
+        val context = requireContext().applicationContext
+        lifecycleScope.launch(Dispatchers.IO) {
+            val ok = setBundledWallpaper(context)
+            withContext(Dispatchers.Main) {
+                showToastShort(context, getString(if (ok) R.string.wallpaper_set else R.string.wallpaper_failed))
+            }
+        }
+    }
+
     private fun setDrawerIconPosition(position: Constants.IconPosition) {
         prefs.drawerIconPosition = position
     }
@@ -533,6 +556,7 @@ class SettingsFragment : Fragment() {
             AppDrawerFlag.SetClickDate -> prefs.clickDateAction = action
             AppDrawerFlag.SetDoubleTap -> prefs.doubleTapAction = action
             AppDrawerFlag.SetHomeApp,
+                AppDrawerFlag.SetGroupApp,
                 AppDrawerFlag.HiddenApps,
                 AppDrawerFlag.LaunchApp -> {}
         }
