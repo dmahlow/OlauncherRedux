@@ -504,7 +504,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setDrawerSortOrder(sortOrder: Constants.SortOrder) {
-        if (sortOrder == Constants.SortOrder.MostUsed && !hasUsageStatsPermission(requireContext())) {
+        if (sortOrder.needsUsageAccess() && !hasUsageStatsPermission(requireContext())) {
             // Need to prompt user to grant usage access permission
             openUsageAccessSettings(requireContext())
         }

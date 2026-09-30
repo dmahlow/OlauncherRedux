@@ -82,10 +82,10 @@ class AppDrawerFragment : Fragment() {
             else -> {}
         }
 
-        // Most-used sorting silently falls back to A-Z without usage access, so tell the user
+        // Usage-based sorting silently falls back to A-Z without usage access, so tell the user
         val prefs = Prefs(requireContext())
         if (flag == AppDrawerFlag.LaunchApp
-            && prefs.drawerSortOrder == Constants.SortOrder.MostUsed
+            && prefs.drawerSortOrder.needsUsageAccess()
             && !hasUsageStatsPermission(requireContext())
         ) {
             binding.appDrawerTip.text = getString(R.string.usage_access_hint)

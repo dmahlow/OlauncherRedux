@@ -20,6 +20,7 @@ Everything OlauncherCF had, plus:
 
 - **App groups on the home screen.** Long press a home screen slot and choose "Set Group". A group shows as `Name ▸`. Tap it to open the group and see its apps; tap outside to close. Groups hold up to 15 apps.
 - **Sort the app drawer by most used.** Apps you open often move to the top. Use in the last 7 days counts more than older use. Apps that are already on the home screen or on a gesture move to the bottom, because they are quick to reach anyway. This is the default. It needs the "Usage access" permission; the drawer shows a hint until you allow it. Without it, the drawer sorts A-Z.
+- **Sort the app drawer by time of day.** A third sort option. Apps you usually open around this time of day move to the top, for example an authenticator in the morning and a video app at night. Weekends and weekdays are learned separately. It counts app launches from about the last one to two weeks, so short-use apps rank fairly. Also needs "Usage access".
 - **Optional app icons in the drawer.** Small icons next to the app names, left or right. Off by default.
 - **Tap an empty slot to pick an app.** No need to long press first.
 - **Bundled wallpaper.** A dark space wallpaper that fits the text-only look. The app offers to set it on first start, and you can set it any time in Settings under Homescreen.

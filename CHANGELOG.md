@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [unreleased]
+
+### Features
+
+- New app drawer sort option "Time of day": ranks apps by how often they were opened around the current time, with separate weekday and weekend patterns
+
 ## [2.1.0] - 2026-08-29
 
 ### Features
@@ -26,7 +32,6 @@ All notable changes to this project will be documented in this file.
 - App drawer sorting by most used with weighted recency
 - Optional app icons in the drawer
 - New defaults: 6 slots, right and bottom alignment, dark theme, status bar on, text size 26
-
 
 ## [unreleased]
 

@@ -70,6 +70,8 @@ The app uses a hybrid UI approach: traditional XML layouts with View Binding for
 
 **Defaults** (`Prefs.kt`): 10 slots, text size 28, most-used sort, right/bottom alignment, dark theme, status bar on. Most-used sort falls back to A-Z without usage access; the drawer shows a tappable hint in that case.
 
+**Time-of-day sort** (`Utils.getTimeOfDayScores()`): counts app launches (foreground app changes) from `UsageStatsManager.queryEvents` over the last 14 days. Each launch is weighted by a Gaussian on circular time-of-day distance (sigma 90 min), a 7-day half-life, and 0.3x if it happened on the other day type (weekday vs weekend); 10% of overall launch weight is added so apps used at other times stay ordered. Android keeps the event log only about 7-10 days.
+
 ### Gesture System
 
 Touch handling abstracted into listener classes:
