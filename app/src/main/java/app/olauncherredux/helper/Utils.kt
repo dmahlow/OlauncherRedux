@@ -3,6 +3,7 @@ package app.olauncherredux.helper
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AppOpsManager
+import android.app.usage.UsageEvents
 import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
 import android.content.*
@@ -47,6 +48,8 @@ import org.json.JSONObject
 import java.io.*
 import java.text.Collator
 import java.util.*
+import kotlin.math.abs
+import kotlin.math.exp
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -114,9 +117,11 @@ suspend fun getAppsList(context: Context, showHiddenApps: Boolean = false): Muta
             }
 
             // Sort based on preference
-            when (prefs.drawerSortOrder) {
-                Constants.SortOrder.MostUsed -> {
-                    val usageScores = getAppUsageScores(context)
+            when (val sortOrder = prefs.drawerSortOrder) {
+                Constants.SortOrder.MostUsed, Constants.SortOrder.TimeOfDay -> {
+                    val usageScores: Map<String, Double> =
+                        if (sortOrder == Constants.SortOrder.TimeOfDay) getTimeOfDayScores(context)
+                        else getAppUsageScores(context).mapValues { it.value.toDouble() }
                     if (usageScores.isNotEmpty()) {
                         // Get apps that are already quick-accessible (home screen + gestures)
                         val quickAccessApps = getQuickAccessApps(prefs)
@@ -133,8 +138,8 @@ suspend fun getAppsList(context: Context, showHiddenApps: Boolean = false): Muta
                                 !aIsQuickAccess && bIsQuickAccess -> -1
                                 else -> {
                                     // Both quick access or both not - sort by usage score
-                                    val scoreA = usageScores.getOrDefault(a.appPackage, 0L)
-                                    val scoreB = usageScores.getOrDefault(b.appPackage, 0L)
+                                    val scoreA = usageScores.getOrDefault(a.appPackage, 0.0)
+                                    val scoreB = usageScores.getOrDefault(b.appPackage, 0.0)
                                     when {
                                         scoreA != scoreB -> scoreB.compareTo(scoreA) // Higher score first
                                         else -> {
@@ -566,4 +571,78 @@ fun setBundledWallpaper(context: Context): Boolean {
         Log.e("Wallpaper", "Error setting wallpaper: $e")
         false
     }
+}
+
+private const val TIME_OF_DAY_LOOKBACK_DAYS = 14
+private const val TIME_OF_DAY_SIGMA_MINUTES = 90.0 // soft window of roughly +-1.5h
+private const val TIME_OF_DAY_HALF_LIFE_DAYS = 7.0
+private const val OTHER_DAY_TYPE_WEIGHT = 0.3 // weekday launches count less on weekends and vice versa
+private const val OVERALL_USAGE_WEIGHT = 0.1 // keeps apps used at other times in a sensible order
+
+/**
+ * Score apps by how often they were opened around the current time of day.
+ *
+ * Every app launch in the system usage log (kept for roughly 7-10 days, depending on the phone)
+ * counts more the closer its time of day is to now (on a 24h circle), the more recent it is,
+ * and whether it happened on the same kind of day (weekday vs weekend).
+ * Counts launches rather than foreground time, so short-session apps like authenticators rank fairly.
+ */
+fun getTimeOfDayScores(context: Context): Map<String, Double> {
+    if (!hasUsageStatsPermission(context)) {
+        return emptyMap()
+    }
+
+    val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+    val now = System.currentTimeMillis()
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = now
+    val nowMinuteOfDay = minuteOfDay(calendar)
+    val nowIsWeekend = isWeekend(calendar)
+
+    val contextual = mutableMapOf<String, Double>()
+    val overall = mutableMapOf<String, Double>()
+
+    try {
+        val events = usageStatsManager.queryEvents(now - TIME_OF_DAY_LOOKBACK_DAYS * 24L * 60 * 60 * 1000, now)
+        val event = UsageEvents.Event()
+        var lastForegroundPackage: String? = null
+
+        while (events.hasNextEvent()) {
+            events.getNextEvent(event)
+            @Suppress("DEPRECATION")
+            if (event.eventType != UsageEvents.Event.MOVE_TO_FOREGROUND) continue
+
+            // Only count a launch when the foreground app changes, so moving between
+            // screens of the same app is not counted as many launches
+            val pkg = event.packageName
+            if (pkg == lastForegroundPackage) continue
+            lastForegroundPackage = pkg
+
+            calendar.timeInMillis = event.timeStamp
+            val ageDays = (now - event.timeStamp) / (24.0 * 60 * 60 * 1000)
+            val recency = 0.5.pow(ageDays / TIME_OF_DAY_HALF_LIFE_DAYS)
+            val dayWeight = if (isWeekend(calendar) == nowIsWeekend) 1.0 else OTHER_DAY_TYPE_WEIGHT
+
+            var diff = abs(minuteOfDay(calendar) - nowMinuteOfDay)
+            if (diff > 12 * 60) diff = 24 * 60 - diff
+            val timeWeight = exp(-(diff.toDouble() * diff) / (2 * TIME_OF_DAY_SIGMA_MINUTES * TIME_OF_DAY_SIGMA_MINUTES))
+
+            contextual[pkg] = contextual.getOrDefault(pkg, 0.0) + timeWeight * dayWeight * recency
+            overall[pkg] = overall.getOrDefault(pkg, 0.0) + dayWeight * recency
+        }
+    } catch (e: Exception) {
+        Log.e("UsageStats", "Error getting usage events: $e")
+    }
+
+    return overall.mapValues { (pkg, total) ->
+        contextual.getOrDefault(pkg, 0.0) + OVERALL_USAGE_WEIGHT * total
+    }
+}
+
+private fun minuteOfDay(calendar: Calendar): Int =
+    calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
+
+private fun isWeekend(calendar: Calendar): Boolean {
+    val day = calendar.get(Calendar.DAY_OF_WEEK)
+    return day == Calendar.SATURDAY || day == Calendar.SUNDAY
 }

@@ -198,15 +198,19 @@ object Constants {
 
     enum class SortOrder: EnumOption {
         Alphabetical,
-        MostUsed;
+        MostUsed,
+        TimeOfDay;
 
         @Composable
         override fun string(): String {
             return when(this) {
                 Alphabetical -> stringResource(R.string.sort_alphabetical)
                 MostUsed -> stringResource(R.string.sort_most_used)
+                TimeOfDay -> stringResource(R.string.sort_time_of_day)
             }
         }
+
+        fun needsUsageAccess(): Boolean = this == MostUsed || this == TimeOfDay
     }
 
     enum class IconPosition: EnumOption {
