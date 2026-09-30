@@ -475,7 +475,35 @@ fun getQuickAccessApps(prefs: Prefs): Set<String> {
         }
     }
 
+    // Gestures set to "open app" without a chosen app fall back to system defaults
+    // (see HomeFragment), so those apps are one gesture away as well
+    val defaultTargets = listOf(
+        prefs.swipeLeftAction to prefs.appSwipeLeft to Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA),
+        prefs.doubleTapAction to prefs.appDoubleTap to Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA),
+        prefs.clickClockAction to prefs.appClickClock to Intent(AlarmClock.ACTION_SHOW_ALARMS),
+        prefs.clickDateAction to prefs.appClickDate to
+            Intent(Intent.ACTION_VIEW, CalendarContract.CONTENT_URI.buildUpon().appendPath("time").build()),
+    )
+    for ((actionAndApp, intent) in defaultTargets) {
+        val (action, app) = actionAndApp
+        if (action == Constants.Action.OpenApp && app.appPackage.isEmpty()) {
+            quickAccessApps.addAll(resolveTargetPackages(prefs.context, intent))
+        }
+    }
+
     return quickAccessApps
+}
+
+private fun resolveTargetPackages(context: Context, intent: Intent): List<String> {
+    return try {
+        val pm = context.packageManager
+        val default = pm.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)?.activityInfo?.packageName
+        // "android" is the app chooser: no single default, so every app that can handle it is one tap away
+        if (default != null && default != "android") listOf(default)
+        else pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY).map { it.activityInfo.packageName }
+    } catch (e: Exception) {
+        emptyList()
+    }
 }
 
 fun hasUsageStatsPermission(context: Context): Boolean {
@@ -582,7 +610,7 @@ private const val OVERALL_USAGE_WEIGHT = 0.1 // keeps apps used at other times i
 /**
  * Score apps by how often they were opened around the current time of day.
  *
- * Every app launch in the system usage log (kept for roughly 7-10 days, depending on the phone)
+ * Every app launch from the launcher in the system usage log (kept for roughly 7-10 days, depending on the phone)
  * counts more the closer its time of day is to now (on a 24h circle), the more recent it is,
  * and whether it happened on the same kind of day (weekday vs weekend).
  * Counts launches rather than foreground time, so short-session apps like authenticators rank fairly.
@@ -605,6 +633,7 @@ fun getTimeOfDayScores(context: Context): Map<String, Double> {
     try {
         val events = usageStatsManager.queryEvents(now - TIME_OF_DAY_LOOKBACK_DAYS * 24L * 60 * 60 * 1000, now)
         val event = UsageEvents.Event()
+        val launcherPackage = context.packageName
         var lastForegroundPackage: String? = null
 
         while (events.hasNextEvent()) {
@@ -612,11 +641,13 @@ fun getTimeOfDayScores(context: Context): Map<String, Double> {
             @Suppress("DEPRECATION")
             if (event.eventType != UsageEvents.Event.MOVE_TO_FOREGROUND) continue
 
-            // Only count a launch when the foreground app changes, so moving between
-            // screens of the same app is not counted as many launches
+            // Only count an app when it was opened from the launcher. Moving between screens
+            // of the same app, notification taps and popups (e.g. calendar reminders) do not count.
             val pkg = event.packageName
             if (pkg == lastForegroundPackage) continue
+            val openedFromLauncher = lastForegroundPackage == launcherPackage
             lastForegroundPackage = pkg
+            if (!openedFromLauncher || pkg == launcherPackage) continue
 
             calendar.timeInMillis = event.timeStamp
             val ageDays = (now - event.timeStamp) / (24.0 * 60 * 60 * 1000)
