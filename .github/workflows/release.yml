@@ -1,9 +1,9 @@
 name: Build & Publish Release APK
 
+# Manual only. Releases are currently built and signed locally, see README.
+# To use this workflow, add the KEY_STORE_BASE64, KEY_STORE, KEY_STORE_PASSWORD,
+# ALIAS and KEY_PASSWORD repository secrets first.
 on:
-  push:
-    tags:
-      - '*'
   workflow_dispatch:
 
 jobs:
@@ -52,7 +52,7 @@ jobs:
     - name: set up JDK 11
       uses: actions/setup-java@v3
       with:
-        java-version: '11'
+        java-version: '17'
         distribution: 'temurin'
         cache: gradle
     - name: Make Gradle executable
@@ -117,7 +117,7 @@ jobs:
       - name: github-action-release-apk
         uses: gogoadl/github-action-release-apk@v1.0.0-alpha09
         with:
-          asset-name: 'OlauncherCF.apk'
+          asset-name: 'OlauncherRedux.apk'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           base64-keystore: ${{ secrets.KEY_STORE_BASE64 }}
           key-file: ${{ secrets.KEY_STORE }}

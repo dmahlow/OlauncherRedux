@@ -1,1 +1,1 @@
-Forked from Olauncher, -clutter, +features
+Minimal text-only launcher with app groups and most-used sorting

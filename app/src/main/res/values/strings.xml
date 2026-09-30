@@ -106,4 +106,22 @@
     <string name="show_app_icons">Show app icons</string>
     <string name="icon_position">Icon position</string>
 
+    <string name="set_app">Set App</string>
+    <string name="set_group">Set Group</string>
+    <string name="edit_group">Edit Group</string>
+    <string name="rename_group">Rename Group</string>
+    <string name="replace">Replace</string>
+    <string name="remove">Remove</string>
+    <string name="add_app">Add App</string>
+    <string name="group_name">Group Name</string>
+    <string name="group">Group</string>
+
+    <string name="wallpaper">Wallpaper</string>
+    <string name="set_wallpaper">Set</string>
+    <string name="wallpaper_prompt_message">Use the OlauncherRedux wallpaper? It is dark and works well with the text-only home screen. You can change this later in the settings.</string>
+    <string name="not_now">Not now</string>
+    <string name="wallpaper_set">Wallpaper set</string>
+    <string name="wallpaper_failed">Could not set wallpaper</string>
+    <string name="usage_access_hint">Allow usage access to sort by most used</string>
+
 </resources>

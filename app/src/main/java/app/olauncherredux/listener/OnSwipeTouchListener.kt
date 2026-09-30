@@ -40,7 +40,13 @@ internal open class OnSwipeTouchListener(c: Context?) : OnTouchListener {
                 doubleTapOn = false
                 onTripleClick()
             }
+            onTapUp()
             return super.onSingleTapUp(e)
+        }
+
+        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+            onSingleClick()
+            return super.onSingleTapConfirmed(e)
         }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
@@ -94,7 +100,8 @@ internal open class OnSwipeTouchListener(c: Context?) : OnTouchListener {
     open fun onLongClick() {}
     open fun onDoubleClick() {}
     open fun onTripleClick() {}
-    private fun onClick() {}
+    open fun onSingleClick() {}
+    open fun onTapUp() {}
 
     init {
         gestureDetector = GestureDetector(c, GestureListener())

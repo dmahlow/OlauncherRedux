@@ -26,7 +26,9 @@ import app.olauncherredux.data.Constants
 import app.olauncherredux.data.Constants.AppDrawerFlag
 import app.olauncherredux.data.Prefs
 import app.olauncherredux.databinding.FragmentAppDrawerBinding
+import app.olauncherredux.helper.hasUsageStatsPermission
 import app.olauncherredux.helper.openAppInfo
+import app.olauncherredux.helper.openUsageAccessSettings
 
 class AppDrawerFragment : Fragment() {
 
@@ -57,12 +59,16 @@ class AppDrawerFragment : Fragment() {
         val flagString = arguments?.getString("flag", AppDrawerFlag.LaunchApp.toString()) ?: AppDrawerFlag.LaunchApp.toString()
         val flag = AppDrawerFlag.valueOf(flagString)
         val n = arguments?.getInt("n", 0) ?: 0
+        val groupAppIndex = arguments?.getInt("groupAppIndex", -1) ?: -1
 
         when (flag) {
             AppDrawerFlag.SetHomeApp -> {
                 binding.drawerButton.text = getString(R.string.rename)
                 binding.drawerButton.isVisible = true
                 binding.drawerButton.setOnClickListener { renameListener(flag, n) }
+            }
+            AppDrawerFlag.SetGroupApp -> {
+                binding.drawerButton.isVisible = false
             }
             AppDrawerFlag.SetSwipeRight,
             AppDrawerFlag.SetSwipeLeft,
@@ -74,6 +80,17 @@ class AppDrawerFragment : Fragment() {
                 }
             }
             else -> {}
+        }
+
+        // Most-used sorting silently falls back to A-Z without usage access, so tell the user
+        val prefs = Prefs(requireContext())
+        if (flag == AppDrawerFlag.LaunchApp
+            && prefs.drawerSortOrder == Constants.SortOrder.MostUsed
+            && !hasUsageStatsPermission(requireContext())
+        ) {
+            binding.appDrawerTip.text = getString(R.string.usage_access_hint)
+            binding.appDrawerTip.visibility = View.VISIBLE
+            binding.appDrawerTip.setOnClickListener { openUsageAccessSettings(requireContext()) }
         }
 
         val viewModel = activity?.run {
@@ -89,13 +106,13 @@ class AppDrawerFragment : Fragment() {
         val appAdapter = AppDrawerAdapter(
             flag,
             gravity,
-            appClickListener(viewModel, flag, n),
+            appClickListener(viewModel, flag, n, groupAppIndex),
             appInfoListener(),
             appShowHideListener(),
             appRenameListener()
         )
 
-        val searchTextView = binding.search.findViewById<TextView>(R.id.search_src_text)
+        val searchTextView = binding.search.findViewById<TextView>(androidx.appcompat.R.id.search_src_text)
         if (searchTextView != null) searchTextView.gravity = gravity
 
         initViewModel(flag, viewModel, appAdapter)
@@ -158,7 +175,7 @@ class AppDrawerFragment : Fragment() {
     private fun View.showKeyboard() {
         if (!Prefs(requireContext()).autoShowKeyboard) return
 
-        val searchTextView = binding.search.findViewById<TextView>(R.id.search_src_text)
+        val searchTextView = binding.search.findViewById<TextView>(androidx.appcompat.R.id.search_src_text)
         searchTextView.requestFocus()
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         searchTextView.postDelayed(Runnable {
@@ -173,9 +190,9 @@ class AppDrawerFragment : Fragment() {
         appAdapter.setAppList(apps.toMutableList())
     }
 
-    private fun appClickListener(viewModel: MainViewModel, flag: AppDrawerFlag, n: Int = 0): (appModel: AppModel) -> Unit =
+    private fun appClickListener(viewModel: MainViewModel, flag: AppDrawerFlag, n: Int = 0, groupAppIndex: Int = -1): (appModel: AppModel) -> Unit =
         { appModel ->
-            viewModel.selectedApp(appModel, flag, n)
+            viewModel.selectedApp(appModel, flag, n, groupAppIndex)
             if (flag == AppDrawerFlag.LaunchApp || flag == AppDrawerFlag.HiddenApps)
                 findNavController().popBackStack(R.id.mainFragment, false)
             else

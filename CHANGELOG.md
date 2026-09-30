@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2026-08-29
+
+### Features
+
+- App groups on the home screen: long press a slot and choose "Set Group"
+- Bundled dark wallpaper with a prompt on first start and a "Set" button in Settings > Homescreen
+- Tap an empty home screen slot to open the app picker
+- Hint in the app drawer when most-used sorting needs the usage access permission
+- New defaults: 10 home screen slots, text size 28, drawer sorted by most used
+- Home screen apps sorted by name length
+
+### Build
+
+- Upgraded to Android Gradle Plugin 8.1.4 and Gradle 8.8 (needs JDK 17)
+- Release builds are signed from a local release.properties file
+
+## [2.0.0] - 2026-01-21
+
+### Features
+
+- Renamed to OlauncherRedux with package name app.olauncherredux
+- App drawer sorting by most used with weighted recency
+- Optional app icons in the drawer
+- New defaults: 6 slots, right and bottom alignment, dark theme, status bar on, text size 26
+
+
 ## [unreleased]
 
 ### 🐛 Bug Fixes
